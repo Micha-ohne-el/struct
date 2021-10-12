@@ -1,19 +1,35 @@
 class Struct {
+  class Char extends Struct.Member {
+    size := 1
+    dllType := "Char"
+  }
   class Byte extends Struct.Member {
     size := 1
     dllType := "Char"
   }
 
+  class Word extends Struct.Member {
+    size := 2
+    dllType := "Short"
+  }
   class Short extends Struct.Member {
     size := 2
     dllType := "Short"
   }
 
+  class Long extends Struct.Member {
+    size := 4
+    dllType := "Int"
+  }
   class Int extends Struct.Member {
     size := 4
     dllType := "Int"
   }
 
+  class LongLong extends Struct.Member {
+    size := 8
+    dllType := "Int64"
+  }
   class Int64 extends Struct.Member {
     size := 8
     dllType := "Int64"
@@ -24,6 +40,10 @@ class Struct {
     dllType := "Float"
   }
 
+  class Double extends Struct.Member {
+    size := 8
+    dllType := "Double"
+  }
   class Float64 extends Struct.Member {
     size := 8
     dllType := "Double"
