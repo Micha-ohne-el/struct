@@ -49,21 +49,27 @@ class Struct {
     dllType := "Double"
   }
 
+  /*
+    Can be used to dynamically set a struct member to the size of the struct.
+  */
+  static autoSize := (struct) => struct.size
+
 
   /*
     Definable Properties:
-    * default: (Any)
+    * default: (Any, optional)
       The default value that this member should have upon initialization.
-    * size: (Integer)
+    * size: (Integer, optional)
       The size in bytes that the member should take up in the struct.
-    * dllType: (String)
+    * dllType: (String, required)
       The type name that should be used when calling `NumGet`/`NumPut`.
-    * alignment: (Integer)
+    * alignment: (Integer, optional)
       The aligment to follow when positioning the member.
       If omitted, `size` is used.
 
     Computed Properties:
-    * offset: (Integer) Offset into the struct at which this member sits.
+    * offset: (Integer)
+      Offset into the struct at which this member sits.
   */
   class Member {
     __new(default := "", options := "") {
@@ -98,6 +104,10 @@ class Struct {
     this.defineProp "_final", {value: true}
 
     for name, member in this._members {
+      for key, value in member.ownProps() {
+        member.%key% := this._realize(value)
+      }
+
       if member.hasProp("default") {
         this.%name% := member.default
       }
@@ -141,5 +151,36 @@ class Struct {
     }
 
     this._members.set name, member
+  }
+
+  ; For allowing functions to be specified in member properties,
+  ; instead of real values:
+  _realize(value) {
+    if value is Func
+      return Struct._safecall(value, this)
+    else
+      return value
+  }
+
+  /*
+    Source: https://github.com/Micha-ohne-el/safecall
+  */
+  static _safecall(function, args*) {
+    if not function is Func
+      throw valueError("Parameter #1 (function) must be of type Func.", -1)
+
+    ; Set the args array length to the correct value:
+    if function.isVariadic
+      args.length := max(args.length, function.minParams)
+    else
+      args.length := min(max(args.length, function.minParams), function.maxParams)
+
+    ; Replace all empty spots with empty strings, except for optional parameters:
+    ; (This is important to catch empty spots in the middle of args.)
+    for index, _ in args
+      if not args.has(index) and not function.isOptional(index)
+        args[index] := ""
+
+    return function(args*)
   }
 }
