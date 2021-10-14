@@ -99,7 +99,7 @@ class Struct {
   }
 
   ; Called after fields are evaluated:
-  __new() {
+  __new(initializer := "") {
     ; Pad the end of the struct to match this._alignment:
     this._size += this._alignment - (mod(this._size, this._alignment) or this._alignment)
 
@@ -113,7 +113,10 @@ class Struct {
         field.%key% := this._realize(value)
       }
 
-      if field.hasProp("default") {
+      if initializer.hasProp(name) {
+        this.%name% := initializer.%name%
+      }
+      else if field.hasProp("default") {
         this.%name% := field.default
       }
     }
