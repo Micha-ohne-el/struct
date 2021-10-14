@@ -86,6 +86,14 @@ class Struct {
   size => this._buffer.size
   ptr => this._buffer.ptr
 
+  clone() {
+    return %this.__class%(this)
+  }
+
+  hasOwnProp(name) {
+    return this._fields.has(name)
+  }
+
   ; Called before fields are evaluated:
   __init() {
     ; List of fields of the struct:
@@ -116,7 +124,7 @@ class Struct {
         field.%key% := this._realize(value)
       }
 
-      if initializer.hasProp(name) {
+      if initializer.hasOwnProp(name) {
         this.%name% := initializer.%name%
       }
       else if field.hasProp("default") {

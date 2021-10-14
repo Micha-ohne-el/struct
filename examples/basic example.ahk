@@ -20,9 +20,7 @@ msgBox myRect.bottom ; 78
 
 ; Clone the rect and inflate it by 2 units in each direction:
 
-myOtherRect := Rect()
-
-dllCall("CopyRect", "Ptr", myOtherRect, "Ptr", myRect)
+myOtherRect := myRect.clone()
 
 dllCall("InflateRect", "Ptr", myOtherRect, "Int", 2, "Int", 2)
 
