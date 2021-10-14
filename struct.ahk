@@ -80,10 +80,12 @@ class Struct {
       if isSet(options)
         for key, value in options.ownProps()
           this.%key% := value
+
+      if not this.hasProp("alignment")
+        this.alignment := this.size
     }
 
     size := 0
-    alignment => this.size
   }
 
   size => this._buffer.size
