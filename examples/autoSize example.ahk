@@ -10,4 +10,4 @@ class Rect extends Struct {
 
 r := Rect()
 
-msgBox r.structSize ; 4 + 4 + 4 + 4 + 1 = 17
+msgBox r.structSize ; 4 + 4 + 4 + 4 + 1 + 3 bytes of padding = 20

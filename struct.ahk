@@ -92,12 +92,17 @@ class Struct {
     this.defineProp "_fields", {value: Map()}
     ; Size that the struct should get:
     this.defineProp "_size", {value: 0}
+    ; Alignment of the struct (equals the largest alignment of all members):
+    this.defineProp "_alignment", {value: 0}
     ; Indicator whether the struct has been initialized:
     this.defineProp "_final", {value: false}
   }
 
   ; Called after fields are evaluated:
   __new() {
+    ; Pad the end of the struct to match this._alignment:
+    this._size += this._alignment - (mod(this._size, this._alignment) or this._alignment)
+
     ; Buffer Object that will hold the actual values in memory:
     this.defineProp "_buffer", {value: Buffer(this._size)}
     ; This means no new fields can be added, all assignments should now change the value in the struct:
@@ -145,6 +150,7 @@ class Struct {
 
     if field.hasProp("size") and field.size {
       align := field.hasProp("alignment") ? field.alignment : field.size
+      this._alignment := max(this._alignment, align)
 
       field.offset := this._size + align - (mod(this._size, align) or align)
       this._size := field.offset + field.size
