@@ -72,12 +72,12 @@ class Struct {
       Offset into the struct at which this field sits.
   */
   class Field {
-    __new(default := "", options := "") {
-      if default !== ""
+    __new(default := unset, options := unset) {
+      if isSet(default)
         this.default := default
 
       ; Flatten the options into this object:
-      if options is Object
+      if isSet(options)
         for key, value in options.ownProps()
           this.%key% := value
     }
@@ -99,7 +99,10 @@ class Struct {
   }
 
   ; Called after fields are evaluated:
-  __new(initializer := "") {
+  __new(initializer := unset) {
+    if not isSet(initializer)
+      initializer := {}
+
     ; Pad the end of the struct to match this._alignment:
     this._size += this._alignment - (mod(this._size, this._alignment) or this._alignment)
 
