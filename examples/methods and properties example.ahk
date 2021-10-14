@@ -24,24 +24,26 @@ class Rect extends Struct {
   }
 
   ; A custom constructor *must* call `super.__new()`:
-  __new() {
-    super.__new()
+  __new(args*) {
+    super.__new(args*)
 
     msgBox "A Rect has been created!"
   }
 }
 
-rect1 := Rect() ; A Rect has been created!
-rect1.left := 12
-rect1.top := 34
-rect1.right := 56
-rect1.bottom := 78
+rect1 := Rect({
+  left:   12,
+  top:    34,
+  right:  56,
+  bottom: 78
+}) ; A Rect has been created!
 
-rect2 := Rect() ; A Rect has been created!
-rect2.left := 112
-rect2.top := 134
-rect2.right := 156
-rect2.bottom := 178
+rect2 := Rect({
+  left:   112,
+  top:    134,
+  right:  156,
+  bottom: 178
+}) ; A Rect has been created!
 
 msgBox rect1.width == rect2.width ; True (1)
 msgBox rect1.height == rect2.height ; True (1)

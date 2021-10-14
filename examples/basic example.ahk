@@ -7,11 +7,9 @@ class Rect extends Struct {
   bottom := Struct.Long()
 }
 
-; Create a new rect and set its values using a DllCall:
+; Create a new rect and set its values using an initializer:
 
-myRect := Rect()
-
-dllCall("SetRect", "Ptr", myRect, "Int", 12, "Int", 34, "Int", 56, "Int", 78)
+myRect := Rect({left: 12, top: 34, right: 56, bottom: 78})
 
 ; Confirm that the values are correctly set and can be accessed through AHK:
 
