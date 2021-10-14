@@ -1,52 +1,52 @@
 class Struct {
   class Char extends Struct.Field {
     size := 1
-    dllType := "Char"
+    type := "Char"
   }
   class Byte extends Struct.Field {
     size := 1
-    dllType := "Char"
+    type := "Char"
   }
 
   class Word extends Struct.Field {
     size := 2
-    dllType := "Short"
+    type := "Short"
   }
   class Short extends Struct.Field {
     size := 2
-    dllType := "Short"
+    type := "Short"
   }
 
   class Long extends Struct.Field {
     size := 4
-    dllType := "Int"
+    type := "Int"
   }
   class Int extends Struct.Field {
     size := 4
-    dllType := "Int"
+    type := "Int"
   }
 
   class LongLong extends Struct.Field {
     size := 8
-    dllType := "Int64"
+    type := "Int64"
   }
   class Int64 extends Struct.Field {
     size := 8
-    dllType := "Int64"
+    type := "Int64"
   }
 
   class Float extends Struct.Field {
     size := 4
-    dllType := "Float"
+    type := "Float"
   }
 
   class Double extends Struct.Field {
     size := 8
-    dllType := "Double"
+    type := "Double"
   }
   class Float64 extends Struct.Field {
     size := 8
-    dllType := "Double"
+    type := "Double"
   }
 
   /*
@@ -61,7 +61,7 @@ class Struct {
       The default value that this field should have upon initialization.
     * size: (Integer, optional)
       The size in bytes that the field should take up in the struct.
-    * dllType: (String, required)
+    * type: (String, required)
       The type name that should be used when calling `NumGet`/`NumPut`.
     * alignment: (Integer, optional)
       The aligment to follow when positioning the field.
@@ -125,7 +125,7 @@ class Struct {
 
     field := this._fields.get(name)
 
-    return numGet(this._buffer, field.offset, field.dllType)
+    return numGet(this._buffer, field.offset, field.type)
   }
 
   __set(name, _, value) {
@@ -141,7 +141,7 @@ class Struct {
 
     field := this._fields.get(name)
 
-    numPut field.dllType, value, this._buffer, field.offset
+    numPut field.type, value, this._buffer, field.offset
   }
 
   _addField(name, field) {
