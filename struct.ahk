@@ -1,56 +1,56 @@
 class Struct {
-  class Char extends Struct.Member {
+  class Char extends Struct.Field {
     size := 1
     dllType := "Char"
   }
-  class Byte extends Struct.Member {
+  class Byte extends Struct.Field {
     size := 1
     dllType := "Char"
   }
 
-  class Word extends Struct.Member {
+  class Word extends Struct.Field {
     size := 2
     dllType := "Short"
   }
-  class Short extends Struct.Member {
+  class Short extends Struct.Field {
     size := 2
     dllType := "Short"
   }
 
-  class Long extends Struct.Member {
+  class Long extends Struct.Field {
     size := 4
     dllType := "Int"
   }
-  class Int extends Struct.Member {
+  class Int extends Struct.Field {
     size := 4
     dllType := "Int"
   }
 
-  class LongLong extends Struct.Member {
+  class LongLong extends Struct.Field {
     size := 8
     dllType := "Int64"
   }
-  class Int64 extends Struct.Member {
+  class Int64 extends Struct.Field {
     size := 8
     dllType := "Int64"
   }
 
-  class Float extends Struct.Member {
+  class Float extends Struct.Field {
     size := 4
     dllType := "Float"
   }
 
-  class Double extends Struct.Member {
+  class Double extends Struct.Field {
     size := 8
     dllType := "Double"
   }
-  class Float64 extends Struct.Member {
+  class Float64 extends Struct.Field {
     size := 8
     dllType := "Double"
   }
 
   /*
-    Can be used to dynamically set a struct member to the size of the struct.
+    Can be used to dynamically set a field to the size of the struct.
   */
   static autoSize := (struct) => struct.size
 
@@ -58,25 +58,25 @@ class Struct {
   /*
     Definable Properties:
     * default: (Any, optional)
-      The default value that this member should have upon initialization.
+      The default value that this field should have upon initialization.
     * size: (Integer, optional)
-      The size in bytes that the member should take up in the struct.
+      The size in bytes that the field should take up in the struct.
     * dllType: (String, required)
       The type name that should be used when calling `NumGet`/`NumPut`.
     * alignment: (Integer, optional)
-      The aligment to follow when positioning the member.
+      The aligment to follow when positioning the field.
       If omitted, `size` is used.
 
     Computed Properties:
     * offset: (Integer)
-      Offset into the struct at which this member sits.
+      Offset into the struct at which this field sits.
   */
-  class Member {
+  class Field {
     __new(default := "", options := "") {
       if default !== ""
         this.default := default
 
-      ; Flatten the options into this member:
+      ; Flatten the options into this object:
       if options is Object
         for key, value in options.ownProps()
           this.%key% := value
@@ -86,74 +86,74 @@ class Struct {
   size => this._buffer.size
   ptr => this._buffer.ptr
 
-  ; Called before members are evaluated:
+  ; Called before fields are evaluated:
   __init() {
-    ; List of members of the struct:
-    this.defineProp "_members", {value: Map()}
+    ; List of fields of the struct:
+    this.defineProp "_fields", {value: Map()}
     ; Size that the struct should get:
     this.defineProp "_size", {value: 0}
     ; Indicator whether the struct has been initialized:
     this.defineProp "_final", {value: false}
   }
 
-  ; Called after members are evaluated:
+  ; Called after fields are evaluated:
   __new() {
     ; Buffer Object that will hold the actual values in memory:
     this.defineProp "_buffer", {value: Buffer(this._size)}
-    ; This means no new members can be added, all assignments should now change the value in the struct:
+    ; This means no new fields can be added, all assignments should now change the value in the struct:
     this.defineProp "_final", {value: true}
 
-    for name, member in this._members {
-      for key, value in member.ownProps() {
-        member.%key% := this._realize(value)
+    for name, field in this._fields {
+      for key, value in field.ownProps() {
+        field.%key% := this._realize(value)
       }
 
-      if member.hasProp("default") {
-        this.%name% := member.default
+      if field.hasProp("default") {
+        this.%name% := field.default
       }
     }
   }
 
   __get(name, _) {
-    if not this._members.has(name)
-      throw propertyError("Unknown member.", -1, name)
+    if not this._fields.has(name)
+      throw propertyError("Unknown field.", -1, name)
 
-    member := this._members.get(name)
+    field := this._fields.get(name)
 
-    return numGet(this._buffer, member.offset, member.dllType)
+    return numGet(this._buffer, field.offset, field.dllType)
   }
 
   __set(name, _, value) {
     if this._final
-      return this._setMember(name, value)
+      return this._setField(name, value)
     else
-      return this._addMember(name, value)
+      return this._addField(name, value)
   }
 
-  _setMember(name, value) {
-    if not this._members.has(name)
-      throw propertyError("Unknown member.", -1, name)
+  _setField(name, value) {
+    if not this._fields.has(name)
+      throw propertyError("Unknown field.", -1, name)
 
-    member := this._members.get(name)
+    field := this._fields.get(name)
 
-    numPut member.dllType, value, this._buffer, member.offset
+    numPut field.dllType, value, this._buffer, field.offset
   }
 
-  _addMember(name, member) {
-    if not member is Struct.Member
-      throw valueError("Members can only be added before initialization", -1)
+  _addField(name, field) {
+    if not field is Struct.Field
+      throw valueError("Fields can only be added before initialization", -1)
 
-    if member.hasProp("size") and member.size {
-      align := member.hasProp("alignment") ? member.alignment : member.size
+    if field.hasProp("size") and field.size {
+      align := field.hasProp("alignment") ? field.alignment : field.size
 
-      member.offset := this._size + align - (mod(this._size, align) or align)
-      this._size := member.offset + member.size
+      field.offset := this._size + align - (mod(this._size, align) or align)
+      this._size := field.offset + field.size
     }
 
-    this._members.set name, member
+    this._fields.set name, field
   }
 
-  ; For allowing functions to be specified in member properties,
+  ; For allowing functions to be specified in field properties,
   ; instead of real values:
   _realize(value) {
     if value is Func
