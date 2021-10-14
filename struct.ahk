@@ -59,13 +59,13 @@ class Struct {
     Definable Properties:
     * default: (Any, optional)
       The default value that this field should have upon initialization.
-    * size: (Integer, optional)
+    * size: (Integer, required)
       The size in bytes that the field should take up in the struct.
     * type: (String, required)
       The type name that should be used when calling `NumGet`/`NumPut`.
-    * alignment: (Integer, optional)
+    * alignment: (Integer, required)
       The aligment to follow when positioning the field.
-      If omitted, `size` is used.
+      If not set, equals `size`.
 
     Computed Properties:
     * offset: (Integer)
@@ -81,6 +81,9 @@ class Struct {
         for key, value in options.ownProps()
           this.%key% := value
     }
+
+    size := 0
+    alignment => this.size
   }
 
   size => this._buffer.size
@@ -159,8 +162,8 @@ class Struct {
     if not field is Struct.Field
       throw valueError("Fields can only be added before initialization", -1)
 
-    if field.hasProp("size") and field.size {
-      align := field.hasProp("alignment") ? field.alignment : field.size
+    if field.size {
+      align := field.alignment
       this._alignment := max(this._alignment, align)
 
       field.offset := this._size + align - (mod(this._size, align) or align)
