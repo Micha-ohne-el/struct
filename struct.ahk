@@ -120,16 +120,13 @@ class Struct {
     this.defineProp "_final", {value: true}
 
     for name, field in this._fields {
-      for key, value in field.ownProps() {
+      for key, value in field.ownProps()
         field.%key% := this._realize(value)
-      }
 
-      if initializer.hasOwnProp(name) {
+      if initializer.hasOwnProp(name)
         this.%name% := initializer.%name%
-      }
-      else if field.hasProp("default") {
+      else if field.hasProp("default")
         this.%name% := field.default
-      }
     }
   }
 
