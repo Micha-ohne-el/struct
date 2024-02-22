@@ -1,0 +1,3 @@
+OVERLAPPED: https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-overlapped
+
+NVME_ADMIN_COMPLETION_QUEUE_BASE_ADDRESS: https://learn.microsoft.com/en-us/windows/win32/api/nvme/ns-nvme-nvme_admin_completion_queue_base_address
